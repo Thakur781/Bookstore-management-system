@@ -1,0 +1,249 @@
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+using namespace std;
+
+class Bookshop {
+public:
+    void controlPanel();
+    void addBook();
+    void displayBooks();
+    void checkBook();
+    void updateBook();
+    void deleteBook();
+};
+
+void Bookshop::controlPanel() {
+    cout << "\n\n\t\t\t\tCONTROL PANEL";
+    cout << "\n\n1. ADD BOOK";
+    cout << "\n2. DISPLAY BOOKS";
+    cout << "\n3. CHECK PARTICULAR BOOK";
+    cout << "\n4. UPDATE BOOK";
+    cout << "\n5. DELETE BOOK";
+    cout << "\n6. EXIT";
+}
+
+void Bookshop::addBook() {
+    ofstream file("book.txt", ios::app);
+    if (!file.is_open()) {
+        cout << "\n\nError opening file!";
+        return;
+    }
+
+    string b_id, b_name, a_name;
+    int no_copy;
+
+    cout << "\n\n\t\t\t\tADD BOOKS";
+    cout << "\n\nBook ID : ";
+    cin >> b_id;
+    cout << "Book Name : ";
+    cin.ignore();
+    getline(cin, b_name);
+    cout << "Author Name : ";
+    getline(cin, a_name);
+    cout << "No. of Copies : ";
+    cin >> no_copy;
+
+    file << b_id << " " << b_name << " " << a_name << " " << no_copy << endl;
+    file.close();
+
+    cout << "\nBook added successfully!\n";
+}
+
+void Bookshop::displayBooks() {
+    ifstream file("book.txt");
+    if (!file.is_open()) {
+        cout << "\n\nError opening file!";
+        return;
+    }
+
+    string b_id, b_name, a_name;
+    int no_copy;
+
+    cout << "\n\n\t\t\t\tDISPLAY BOOKS\n";
+    cout << "\nBook ID\t\tBook\t\tAuthor\t\tNo. of Copies\n\n";
+
+    while (file >> b_id >> b_name >> a_name >> no_copy) {
+        cout << b_id << "\t\t" << b_name << "\t\t" << a_name << "\t\t" << no_copy << "\n\n";
+    }
+
+    file.close();
+    system("pause");
+}
+
+void Bookshop::checkBook() {
+    ifstream file("book.txt");
+    if (!file.is_open()) {
+        cout << "\n\nError opening file!";
+        return;
+    }
+
+    string b_id, b_name, a_name, search_id;
+    int no_copy;
+    bool found = false;
+
+    cout << "\n\n\t\t\t\tCHECK PARTICULAR BOOK";
+    cout << "\n\nEnter Book ID to search: ";
+    cin >> search_id;
+
+    while (file >> b_id >> b_name >> a_name >> no_copy) {
+        if (b_id == search_id) {
+            found = true;
+            cout << "\n\nBook ID : " << b_id;
+            cout << "\nBook Name : " << b_name;
+            cout << "\nAuthor Name : " << a_name;
+            cout << "\nNo. of Copies : " << no_copy << endl << endl;
+            break;
+        }
+    }
+
+    if (!found) {
+        cout << "\nBook ID Not Found...\n\n";
+    }
+
+    file.close();
+    system("pause");
+}
+
+void Bookshop::updateBook() {
+    ifstream file("book.txt");
+    if (!file.is_open()) {
+        cout << "\n\nError opening file!";
+        return;
+    }
+
+    ofstream temp("temp.txt");
+    if (!temp.is_open()) {
+        cout << "\n\nError opening file!";
+        file.close();
+        return;
+    }
+
+    string b_id, b_name, a_name, update_id;
+    int no_copy, update_no_copy;
+    bool found = false;
+
+    cout << "\n\n\t\t\t\tUPDATE BOOK";
+    cout << "\n\nEnter Book ID to update: ";
+    cin >> update_id;
+
+    while (file >> b_id >> b_name >> a_name >> no_copy) {
+        if (b_id == update_id) {
+            found = true;
+            cout << "\nCurrent Details:";
+            cout << "\nBook ID : " << b_id;
+            cout << "\nBook Name : " << b_name;
+            cout << "\nAuthor Name : " << a_name;
+            cout << "\nNo. of Copies : " << no_copy << endl;
+
+            cout << "\n\nEnter New Details:";
+            cout << "\nBook Name : ";
+            cin.ignore();
+            getline(cin, b_name);
+            cout << "Author Name : ";
+            getline(cin, a_name);
+            cout << "No. of Copies : ";
+            cin >> update_no_copy;
+
+            temp << update_id << " " << b_name << " " << a_name << " " << update_no_copy << endl;
+            cout << "\nBook updated successfully!\n";
+        } else {
+            temp << b_id << " " << b_name << " " << a_name << " " << no_copy << endl;
+        }
+    }
+
+    if (!found) {
+        cout << "\nBook ID Not Found...\n\n";
+    }
+
+    file.close();
+    temp.close();
+
+    remove("book.txt");
+    rename("temp.txt", "book.txt");
+
+    system("pause");
+}
+
+void Bookshop::deleteBook() {
+    ifstream file("book.txt");
+    if (!file.is_open()) {
+        cout << "\n\nError opening file!";
+        return;
+    }
+
+    ofstream temp("temp.txt");
+    if (!temp.is_open()) {
+        cout << "\n\nError opening file!";
+        file.close();
+        return;
+    }
+
+    string b_id, b_name, a_name, delete_id;
+    int no_copy;
+    bool found = false;
+
+    cout << "\n\n\t\t\t\tDELETE BOOK";
+    cout << "\n\nEnter Book ID to delete: ";
+    cin >> delete_id;
+
+    while (file >> b_id >> b_name >> a_name >> no_copy) {
+        if (b_id == delete_id) {
+            found = true;
+            cout << "\nBook Deleted Successfully!\n";
+        } else {
+            temp << b_id << " " << b_name << " " << a_name << " " << no_copy << endl;
+        }
+    }
+
+    if (!found) {
+        cout << "\nBook ID Not Found...\n\n";
+    }
+
+    file.close();
+    temp.close();
+
+    remove("book.txt");
+    rename("temp.txt", "book.txt");
+
+    system("pause");
+}
+
+void bookShopRecord() {
+    Bookshop b;
+    int choice;
+
+    while (true) {
+        system("cls");
+        b.controlPanel();
+        cout << "\n\nEnter your choice : ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                b.addBook();
+                break;
+            case 2:
+                b.displayBooks();
+                break;
+            case 3:
+                b.checkBook();
+                break;
+            case 4:
+                b.updateBook();
+                break;
+            case 5:
+                b.deleteBook();
+                break;
+            case 6:
+                exit(0);
+            default:
+                cout << "\n\nINVALID CHOICE\n";
+        }
+    }
+}
+
+int main() {
+    bookShopRecord();
+    return 0;
+}
